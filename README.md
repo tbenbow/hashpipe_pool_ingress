@@ -7,7 +7,7 @@ This is the repo for ingress into influx db.
 
 2. Run `npm install`
 
-3. Copy "env-sample.js" as "env.js", same env file as the dashboard.
+3. Copy "env-sample.js" as "env.js". Fill in influx credentials - same env file as the dashboard.
 
 4. To start posting data run `node parse.js`
 
