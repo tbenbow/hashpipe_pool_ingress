@@ -10,3 +10,8 @@ This is the repo for ingress into influx db.
 3. Copy "env-sample.js" as "env.js", same env file as the dashboard.
 
 4. To start posting data run `node parse.js`
+
+
+# Details
+
+The script will post to influx every minute using node-cron.
