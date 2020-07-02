@@ -1,33 +1,43 @@
 const path = require('path');
 const fs = require('fs');
+const cron = require("node-cron");
 const {InfluxDB, Point, HttpError} = require('@influxdata/influxdb-client');
 const {url, token, org, bucket} = require('./env');
 const {hostname} = require('os');
 
-var testTime = new Date();
-console.log(testTime);
+var testTime;
+
+cron.schedule("*/10 * * * * *", function() {
+  testTime = new Date();
+  console.log("Writing Data: ", testTime);
+  parsePoolFile('json/pool.status');
+  directoryFileList('json/users');
+});
 
 
 // Pool Data
 //---------------------------------
-let pooldata = fs.readFileSync('json/pool.status', 'utf8');
-let pooldataarray = pooldata.split("\n");
-let pool = JSON.parse(pooldataarray[0]);
+function parsePoolFile(file) {
+  let poolFile = fs.readFileSync(file, 'utf8');
+  let poolFileArray = poolFile.split("\n");
+  let poolJson = JSON.parse(poolFileArray[0]);
 
-writePoolData(pool);
+  console.log(poolJson);
+  writePoolData(poolJson);
+}
 
-function writePoolData(pool) {
+function writePoolData(poolJson) {
   const writeApi = new InfluxDB({url, token}).getWriteApi(org, bucket, 'ns')
 
   writeApi.useDefaultTags({location: hostname()})
 
   const poolWorkers = new Point('pool-workers')
-    .floatField('value', pool.Workers)
+    .floatField('value', poolJson.Workers)
     .timestamp(testTime)
     writeApi.writePoint(poolWorkers)
 
   const poolUsers = new Point('pool-users')
-    .floatField('value', pool.Users)
+    .floatField('value', poolJson.Users)
     .timestamp(testTime)
   writeApi.writePoint(poolUsers)
 
@@ -44,8 +54,6 @@ function writePoolData(pool) {
 
 // User Data
 //---------------------------------
-directoryFileList('json/users');
-
 function directoryFileList(directory) {
   const directoryPath = path.join(__dirname, directory);
 

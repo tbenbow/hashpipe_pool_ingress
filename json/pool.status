@@ -1,4 +1,4 @@
-{"runtime": 64383, "lastupdate": 1593645707, "Users": 2, "Workers": 20, "Idle": 11, "Disconnected": 3}
+{"runtime": 64383, "lastupdate": 1593645707, "Users": 4, "Workers": 10, "Idle": 11, "Disconnected": 3}
 {"hashrate1m": "579T", "hashrate5m": "561T", "hashrate15m": "558T", "hashrate1hr": "551T", "hashrate6hr": "418T", "hashrate1d": "291T", "hashrate7d": "189T"}
 {"SPS1m": 2.99, "SPS5m": 2.9, "SPS15m": 2.88, "SPS1h": 2.84}
 {"diff": "15.3", "accepted": 49538330000, "rejected": 51880000, "lns": 93370540000.3, "herp": 93424869235.60028, "reward": 6.25080348}
