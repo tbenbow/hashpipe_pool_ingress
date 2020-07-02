@@ -7,7 +7,7 @@ const {hostname} = require('os');
 
 var testTime;
 
-cron.schedule("*/10 * * * * *", function() {
+cron.schedule("* * * * * *", function() {
   testTime = new Date();
   console.log("Writing Data: ", testTime);
   parsePoolFile('json/pool.status');
