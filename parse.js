@@ -7,8 +7,10 @@ const {hostname} = require('os');
 
 var testTime;
 
-cron.schedule("* * * * * *", function() {
-  testTime = new Date();
+// Every Minute "* * * * *"
+// Every Second "* * * * * *"
+cron.schedule("* * * * *", function() {
+  const testTime = new Date();
   console.log("Writing Data: ", testTime);
   parsePoolFile('json/pool.status');
   directoryFileList('json/users');
@@ -22,24 +24,23 @@ function parsePoolFile(file) {
   let poolFileArray = poolFile.split("\n");
   let poolJson = JSON.parse(poolFileArray[0]);
 
-  console.log(poolJson);
   writePoolData(poolJson);
 }
 
 function writePoolData(poolJson) {
-  const writeApi = new InfluxDB({url, token}).getWriteApi(org, bucket, 'ns')
+  const writeApi = new InfluxDB({url, token}).getWriteApi(org, bucket, 'ns');
 
-  writeApi.useDefaultTags({location: hostname()})
+  writeApi.useDefaultTags({location: hostname()});
 
   const poolWorkers = new Point('pool-workers')
     .floatField('value', poolJson.Workers)
-    .timestamp(testTime)
-    writeApi.writePoint(poolWorkers)
+    .timestamp(testTime);
+  writeApi.writePoint(poolWorkers);
 
   const poolUsers = new Point('pool-users')
     .floatField('value', poolJson.Users)
-    .timestamp(testTime)
-  writeApi.writePoint(poolUsers)
+    .timestamp(testTime);
+  writeApi.writePoint(poolUsers);
 
   writeApi
     .close()
@@ -49,7 +50,7 @@ function writePoolData(poolJson) {
     .catch(e => {
       console.error(e)
       console.log('\nFinished ERROR')
-    })
+    });
 }
 
 // User Data
@@ -82,7 +83,7 @@ function parseUserFiles(fileArray) {
     users.push({
       time: user.time,
       username: file,
-      userhashrate: user.hashrate1m,
+      userhashrate: toPetahash(user.hashrate1m).toFixed(6),
     });
 
     // workers
@@ -92,7 +93,7 @@ function parseUserFiles(fileArray) {
         time: user.time,
         username: file,
         workername: workerIdArray[workerIdArray.length-1],
-        workerhashrate: worker.hashrate1m,
+        workerhashrate: toPetahash(worker.hashrate1m).toFixed(6),
       });
     })
   })
@@ -143,4 +144,26 @@ function writePoints(points) {
       console.error(e)
       console.log('\nFinished ERROR')
     })
+}
+
+
+// Conversion
+// 1 Gigahash (G) = 1000 Megahash
+// 1 Terahash (T) = 1000 Gigahash
+// 1 Petahash (P) = 1000 Terahash
+// 1 Exahash (E) = 1000 Petahash
+//
+// Expects a string that ends with a single letter 'G', 'T','P','E'
+//-----------------------------------------------------------------
+function toPetahash(withUnit) {
+  const amount = withUnit.slice(0, -1);
+  const unit = withUnit.slice(-1);
+  const conversionTable = {
+    'G': 1000000,
+    'T': 1000,
+    'P': 1,
+    'E': .001,
+  };
+
+  return amount / conversionTable[unit];
 }

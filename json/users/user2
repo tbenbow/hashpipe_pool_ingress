@@ -1,5 +1,5 @@
 {
- "hashrate1m": "230",
+ "hashrate1m": "230T",
  "hashrate5m": "0",
  "hashrate1hr": "0",
  "hashrate1d": "215G",
@@ -18,7 +18,7 @@
  "worker": [
   {
    "workername": "qrxzmluq34jhreydvntux0v0y2q7xxkyduy2pjakmc.35x244",
-   "hashrate1m": "6.5",
+   "hashrate1m": "6.5T",
    "hashrate5m": "0",
    "hashrate1hr": "0",
    "hashrate1d": "21.8G",
@@ -32,7 +32,7 @@
   },
   {
    "workername": "qrxzmluq34jhreydvntux0v0y2q7xxkyduy2pjakmc.35x238",
-   "hashrate1m": "5.1",
+   "hashrate1m": "5.1T",
    "hashrate5m": "0",
    "hashrate1hr": "0",
    "hashrate1d": "21.5G",
@@ -46,7 +46,7 @@
   },
   {
    "workername": "qrxzmluq34jhreydvntux0v0y2q7xxkyduy2pjakmc.35x239",
-   "hashrate1m": "7.3",
+   "hashrate1m": "7.3T",
    "hashrate5m": "0",
    "hashrate1hr": "0",
    "hashrate1d": "21.8G",
@@ -60,7 +60,7 @@
   },
   {
    "workername": "qrxzmluq34jhreydvntux0v0y2q7xxkyduy2pjakmc.35x240",
-   "hashrate1m": "2.3",
+   "hashrate1m": "2.3T",
    "hashrate5m": "0",
    "hashrate1hr": "0",
    "hashrate1d": "21.8G",
@@ -74,7 +74,7 @@
   },
   {
    "workername": "qrxzmluq34jhreydvntux0v0y2q7xxkyduy2pjakmc.35x243",
-   "hashrate1m": "8.2",
+   "hashrate1m": "8.2T",
    "hashrate5m": "0",
    "hashrate1hr": "0",
    "hashrate1d": "20.7G",
@@ -88,7 +88,7 @@
   },
   {
    "workername": "qrxzmluq34jhreydvntux0v0y2q7xxkyduy2pjakmc.35x237",
-   "hashrate1m": "9.0",
+   "hashrate1m": "9.0T",
    "hashrate5m": "0",
    "hashrate1hr": "0",
    "hashrate1d": "20.7G",
@@ -102,7 +102,7 @@
   },
   {
    "workername": "qrxzmluq34jhreydvntux0v0y2q7xxkyduy2pjakmc.35x242",
-   "hashrate1m": "12.0",
+   "hashrate1m": "12.0T",
    "hashrate5m": "0",
    "hashrate1hr": "0",
    "hashrate1d": "21.5G",
@@ -116,7 +116,7 @@
   },
   {
    "workername": "qrxzmluq34jhreydvntux0v0y2q7xxkyduy2pjakmc.35x245",
-   "hashrate1m": "9.0",
+   "hashrate1m": "9.0T",
    "hashrate5m": "0",
    "hashrate1hr": "0",
    "hashrate1d": "20.7G",
@@ -130,7 +130,7 @@
   },
   {
    "workername": "qrxzmluq34jhreydvntux0v0y2q7xxkyduy2pjakmc.35x246",
-   "hashrate1m": "7.4",
+   "hashrate1m": "7.4T",
    "hashrate5m": "0",
    "hashrate1hr": "0",
    "hashrate1d": "21.5G",
@@ -144,7 +144,7 @@
   },
   {
    "workername": "qrxzmluq34jhreydvntux0v0y2q7xxkyduy2pjakmc.35x241",
-   "hashrate1m": "6.9",
+   "hashrate1m": "6.9T",
    "hashrate5m": "0",
    "hashrate1hr": "0",
    "hashrate1d": "20.7G",
