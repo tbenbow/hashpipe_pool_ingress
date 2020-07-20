@@ -12,4 +12,4 @@ This is the repo for ingress into influx db.
 4. To start posting data run `node parse.js`
 
 
-The script will post to influx every minute using node-cron. Values are stores as Petahash with a maximum of 6 decimal places.
+The script will post to influx every minute using node-cron. Values are stored as Petahash with a maximum of 6 decimal places.

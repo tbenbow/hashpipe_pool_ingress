@@ -5,45 +5,45 @@ const {InfluxDB, Point, HttpError} = require('@influxdata/influxdb-client');
 const {url, token, org, bucket} = require('./env');
 const {hostname} = require('os');
 
-var testTime;
+var postTime;
 
 // Every Minute "* * * * *"
 // Every Second "* * * * * *"
 cron.schedule("* * * * *", function() {
-  const testTime = new Date();
-  console.log("Writing Data: ", testTime);
-  parsePoolFile('json/pool.status');
+  const postTime = new Date();
+  console.log("Writing Data: ", postTime);
+  writePoolData('json/pool.status');
   directoryFileList('json/users');
 });
 
 
 // Pool Data
 //---------------------------------
-function parsePoolFile(file) {
-  let poolFile = fs.readFileSync(file, 'utf8');
-  let poolFileArray = poolFile.split("\n");
-  let poolJson = JSON.parse(poolFileArray[0]);
-
-  writePoolData(poolJson);
-}
-
-function writePoolData(poolJson) {
+function writePoolData(file) {
   const writeApi = new InfluxDB({url, token}).getWriteApi(org, bucket, 'ns');
+  const poolFile = fs.readFileSync(file, 'utf8');  const poolFileArray = poolFile.split("\n");
+  const poolJsonLine1 = JSON.parse(poolFileArray[0]);
+  const poolJsonLine2 = JSON.parse(poolFileArray[1]);
 
   writeApi.useDefaultTags({location: hostname()});
 
   const poolWorkers = new Point('pool-workers')
-    .floatField('value', poolJson.Workers)
-    .timestamp(testTime);
+  .floatField('value', poolJsonLine1.Workers)
+  .timestamp(postTime);
   writeApi.writePoint(poolWorkers);
 
   const poolUsers = new Point('pool-users')
-    .floatField('value', poolJson.Users)
-    .timestamp(testTime);
+  .floatField('value', poolJsonLine1.Users)
+  .timestamp(postTime);
   writeApi.writePoint(poolUsers);
 
+  const poolHashrate = new Point('pool-hashrate')
+  .floatField('value', toPetahash(poolJsonLine2.hashrate1m).toFixed(4))
+  .timestamp(postTime);
+  writeApi.writePoint(poolHashrate);
+
   writeApi
-    .close()
+  .close()
     .then(() => {
       console.log('FINISHED...')
     })
@@ -83,7 +83,7 @@ function parseUserFiles(fileArray) {
     users.push({
       time: user.time,
       username: file,
-      userhashrate: toPetahash(user.hashrate1m).toFixed(6),
+      userhashrate: toPetahash(user.hashrate1m).toFixed(4),
     });
 
     // workers
@@ -93,7 +93,7 @@ function parseUserFiles(fileArray) {
         time: user.time,
         username: file,
         workername: workerIdArray[workerIdArray.length-1],
-        workerhashrate: toPetahash(worker.hashrate1m).toFixed(6),
+        workerhashrate: toPetahash(worker.hashrate1m).toFixed(4),
       });
     })
   })
@@ -109,7 +109,7 @@ function createUserPoints(users) {
     const userPoint = new Point('user-hashrate')
       .floatField('value', user.userhashrate)
       .tag('user', user.username)
-      .timestamp(testTime)
+      .timestamp(postTime)
     userPoints.push(userPoint);
 
     writePoints(userPoints);
@@ -124,7 +124,7 @@ function createWorkerPoints(workers) {
       .floatField('value', worker.workerhashrate)
       .tag('user', worker.username)
       .tag('worker', worker.workername)
-      .timestamp(testTime)
+      .timestamp(postTime)
     workerPoints.push(userPoint);
 
     writePoints(workerPoints);
