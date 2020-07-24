@@ -1,0 +1,24 @@
+{
+  "name": "hashpipe_pool_ingress",
+  "version": "1.0.0",
+  "description": "This is the repo for ingress into influx db.",
+  "main": "parse.js",
+  "dependencies": {
+    "@influxdata/influxdb-client": "^1.5.0",
+    "node-cron": "^2.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tbenbow/hashpipe_pool_ingress.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tbenbow/hashpipe_pool_ingress/issues"
+  },
+  "homepage": "https://github.com/tbenbow/hashpipe_pool_ingress#readme"
+}

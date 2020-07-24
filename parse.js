@@ -9,7 +9,7 @@ var postTime;
 
 // Every Minute "* * * * *"
 // Every Second "* * * * * *"
-cron.schedule("* * * * *", function() {
+cron.schedule("* * * * * *", function() {
   const postTime = new Date();
   console.log("Writing Data: ", postTime);
   writePoolData('json/pool.status');
