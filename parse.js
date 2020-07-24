@@ -2,18 +2,18 @@ const path = require('path');
 const fs = require('fs');
 const cron = require("node-cron");
 const {InfluxDB, Point, HttpError} = require('@influxdata/influxdb-client');
-const {url, token, org, bucket} = require('./env');
+const {url, token, org, bucket, poolFilePath, userFilesPath} = require('./env');
 const {hostname} = require('os');
 
 var postTime;
 
 // Every Minute "* * * * *"
 // Every Second "* * * * * *"
-cron.schedule("* * * * * *", function() {
+cron.schedule("*/10 * * * * *", function() {
   const postTime = new Date();
   console.log("Writing Data: ", postTime);
-  writePoolData('json/pool.status');
-  directoryFileList('json/users');
+  writePoolData(poolFilePath);
+  directoryFileList(userFilesPath);
 });
 
 
@@ -76,7 +76,7 @@ function parseUserFiles(fileArray) {
   workers = [];
 
   fileArray.forEach(function (file) {
-    let userData = fs.readFileSync(`json/users/${file}`, 'utf8');
+    let userData = fs.readFileSync(`${userFilesPath}/${file}`, 'utf8');
     let user = JSON.parse(userData);
 
     // users
