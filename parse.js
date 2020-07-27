@@ -3,19 +3,23 @@ const fs = require('fs');
 const cron = require("node-cron");
 const Timestamp = require("timestamp-nano");
 const {InfluxDB, Point, HttpError} = require('@influxdata/influxdb-client');
-const {url, token, org, bucket, poolFilePath, userFilesPath, blockFilesPath} = require('./env');
 const {hostname} = require('os');
-const {callbackify}  = require('util');
 
 var postTime;
 
-// Every Minute "* * * * *"
-// Every Second "* * * * * *"
-cron.schedule("*/10 * * * * *", function() {
+// Environment Variables
+const {url, token, org, bucket} = require('./env');
+const poolFilePath = 'json/pool.status';
+const userFilesPath = 'json/users';
+const blockFilesPath = 'json/blocks';
+// TODO: This should come from the env file, uncomment the line below and comment the four above to test that.
+// const {url, token, org, bucket, poolFilePath, userFilesPath, blockFilesPath} = require('./env');
+
+// Every minute "* * * * *" or every 10 seconds "*/10 * * * * *"
+cron.schedule("* * * * *", function() {
   const postTime = new Date();
   console.log("Writing Data: ", postTime);
   writePoolData(poolFilePath);
-  directoryFileList(userFilesPath);
   readUserFiles(userFilesPath);
   readBlockFiles(blockFilesPath);
 });
