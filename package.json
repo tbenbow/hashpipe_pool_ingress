@@ -5,7 +5,8 @@
   "main": "parse.js",
   "dependencies": {
     "@influxdata/influxdb-client": "^1.5.0",
-    "node-cron": "^2.0.3"
+    "node-cron": "^2.0.3",
+    "timestamp-nano": "^1.0.0"
   },
   "devDependencies": {},
   "scripts": {

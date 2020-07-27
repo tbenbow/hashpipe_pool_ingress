@@ -1,0 +1,18 @@
+{
+ "height": 634114,
+ "reward": 6.25184441,
+ "fee": 0.06251844,
+ "net_fee": 0.05001477,
+ "dev_donation": 0.01250368,
+ "payouts": {
+  "user1": 4.63378805,
+  "user2": 1.55553791
+ },
+ "herp": 43825575644.5,
+ "postponed": {},
+ "solvedby": "qqnyyxxs7fhknumr2yvdfgnw4zn84rpcs5te0m8tk9",
+ "date": "[2020-07-23 23:21:56.085]",
+ "hash": "0000000000000000024c772d8356ed8422b8faffa2a4d65aa903cf3c964153f3",
+ "shares": 43832210000,
+ "diff": 20.7
+}
