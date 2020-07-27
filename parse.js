@@ -1,9 +1,11 @@
 const path = require('path');
 const fs = require('fs');
 const cron = require("node-cron");
+const Timestamp = require("timestamp-nano");
 const {InfluxDB, Point, HttpError} = require('@influxdata/influxdb-client');
-const {url, token, org, bucket, poolFilePath, userFilesPath} = require('./env');
+const {url, token, org, bucket, poolFilePath, userFilesPath, blockFilesPath} = require('./env');
 const {hostname} = require('os');
+const {callbackify}  = require('util');
 
 var postTime;
 
@@ -14,6 +16,8 @@ cron.schedule("*/10 * * * * *", function() {
   console.log("Writing Data: ", postTime);
   writePoolData(poolFilePath);
   directoryFileList(userFilesPath);
+  readUserFiles(userFilesPath);
+  readBlockFiles(blockFilesPath);
 });
 
 
@@ -41,7 +45,6 @@ function writePoolData(file) {
   .floatField('value', toPetahash(poolJsonLine2.hashrate1m).toFixed(4))
   .timestamp(postTime);
   writeApi.writePoint(poolHashrate);
-
   writeApi
   .close()
     .then(() => {
@@ -55,49 +58,35 @@ function writePoolData(file) {
 
 // User Data
 //---------------------------------
-function directoryFileList(directory) {
-  const directoryPath = path.join(__dirname, directory);
-
-  fs.readdir(directoryPath, function (err, files) {
-    fileArray = [];
-    if (err) {
-      console.log('Unable to scan directory: ' + err);
-    }
-    files.forEach(function (file) {
-      fileArray.push(file);
-    });
-
-    parseUserFiles(fileArray);
-  });
+function readUserFiles(directory) {
+  getDirectoryFileList(directory, parseUserFiles);
 }
 
-function parseUserFiles(fileArray) {
-  users = [];
-  workers = [];
-
-  fileArray.forEach(function (file) {
+function parseUserFiles(fileList) {
+  var users = [];
+  var workers = [];
+  fileList.forEach(function (file) {
     let userData = fs.readFileSync(`${userFilesPath}/${file}`, 'utf8');
     let user = JSON.parse(userData);
-
-    // users
-    users.push({
-      time: user.time,
-      username: file,
-      userhashrate: toPetahash(user.hashrate1m).toFixed(4),
-    });
-
-    // workers
-    user.worker.forEach(function (worker) {
-      workerIdArray = worker.workername.split('.');
-      workers.push({
+    if (parseInt(user.hashrate1m) > 0) {
+      users.push({
         time: user.time,
         username: file,
-        workername: workerIdArray[workerIdArray.length-1],
-        workerhashrate: toPetahash(worker.hashrate1m).toFixed(4),
+        userhashrate: toPetahash(user.hashrate1m).toFixed(4),
       });
-    })
-  })
-
+      user.worker.forEach(function (worker) {
+        if (parseInt(worker.hashrate1m) > 0) {
+          workerIdArray = worker.workername.split('.');
+          workers.push({
+            time: user.time,
+            username: file,
+            workername: workerIdArray[workerIdArray.length-1],
+            workerhashrate: toPetahash(worker.hashrate1m).toFixed(4),
+          });
+        }
+      });
+    }
+  });
   createUserPoints(users);
   createWorkerPoints(workers);
 }
@@ -112,8 +101,8 @@ function createUserPoints(users) {
       .timestamp(postTime)
     userPoints.push(userPoint);
 
-    writePoints(userPoints);
   });
+  writePoints(userPoints);
 }
 
 function createWorkerPoints(workers) {
@@ -131,6 +120,69 @@ function createWorkerPoints(workers) {
   });
 }
 
+// Blocks
+//---------------------------------
+function readBlockFiles(directory) {
+  getDirectoryFileList(directory, parseBlockFiles);
+}
+
+function parseBlockFiles(fileList) {
+  var blocks = [];
+  var payouts = [];
+  fileList.forEach(function (file) {
+    let blockData = fs.readFileSync(`${blockFilesPath}/${file}`, 'utf8');
+    let block = JSON.parse(blockData);
+    const isoDateString = block.date.replace(' ','T').replace('[','').replace(']','Z'); // Setting up as ISO UTC format
+    const timestamp = Timestamp.fromDate(new Date(isoDateString)).time * 1000000;
+    blocks.push({
+      time: timestamp,
+      hash: block.hash,
+      height: block.height,
+      reward: block.reward
+    });
+    Object.keys(block.payouts).forEach(function (key, index) {
+      payouts.push({
+        time: timestamp,
+        username: key,
+        amount: block.payouts[key],
+        block: block.height,
+        hash: block.hash
+      });
+    });
+  });
+  createBlockPoints(blocks);
+  createPayoutPoints(payouts);
+}
+
+function createBlockPoints(blocks) {
+  var blockPoints = [];
+  blocks.forEach(function (block){
+    const blockPoint = new Point('blocks')
+      .floatField('height', block.height)
+      .tag('hash', block.hash)
+      .tag('amount', block.reward)
+      .timestamp(block.time)
+    blockPoints.push(blockPoint);
+  });
+  writePoints(blockPoints);
+}
+
+function createPayoutPoints(payouts) {
+  var payoutPoints = [];
+  payouts.forEach(function (payout){
+    const payoutPoint = new Point('payouts')
+      .floatField('block', payout.block)
+      .tag('user', payout.username)
+      .tag('hash', payout.hash)
+      .tag('amount', payout.amount)
+      .timestamp(payout.time)
+    payoutPoints.push(payoutPoint);
+  });
+  writePoints(payoutPoints);
+}
+
+// Write Points
+//---------------------------------
 function writePoints(points) {
   const writeApi = new InfluxDB({url, token}).getWriteApi(org, bucket, 'ns')
   writeApi.useDefaultTags({location: hostname()})
@@ -144,6 +196,22 @@ function writePoints(points) {
       console.error(e)
       console.log('\nFinished ERROR')
     })
+}
+
+// Read Files
+//---------------------------------
+function getDirectoryFileList(directory, callback) {
+  const directoryPath = path.join(__dirname, directory);
+  fs.readdir(directoryPath, function (err, files) {
+    var fileList = [];
+    if (err) {
+      console.log('Unable to scan directory: ' + err);
+    }
+    files.forEach(function (file) {
+      fileList.push(file);
+    });
+    callback(fileList);
+  });
 }
 
 
