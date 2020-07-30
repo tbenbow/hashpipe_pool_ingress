@@ -16,7 +16,7 @@ const blockFilesPath = 'json/blocks';
 // const {url, token, org, bucket, poolFilePath, userFilesPath, blockFilesPath} = require('./env');
 
 // Every minute "* * * * *" or every 10 seconds "*/10 * * * * *"
-cron.schedule("* * * * *", function() {
+cron.schedule("*\10 * * * * *", function() {
   const postTime = new Date();
   console.log("Writing Data: ", postTime);
   writePoolData(poolFilePath);
@@ -133,7 +133,10 @@ function readBlockFiles(directory) {
 function parseBlockFiles(fileList) {
   var blocks = [];
   var payouts = [];
-  fileList.forEach(function (file) {
+  const validFileList = fileList.filter(function(file) {
+    return path.extname(file).toLowerCase() === '.confirmed';
+  });
+  validFileList.forEach(function (file) {
     let blockData = fs.readFileSync(`${blockFilesPath}/${file}`, 'utf8');
     let block = JSON.parse(blockData);
     const isoDateString = block.date.replace(' ','T').replace('[','').replace(']','Z'); // Setting up as ISO UTC format
@@ -156,6 +159,7 @@ function parseBlockFiles(fileList) {
   });
   createBlockPoints(blocks);
   createPayoutPoints(payouts);
+  renameBlockFiles(validFileList);
 }
 
 function createBlockPoints(blocks) {
@@ -183,6 +187,18 @@ function createPayoutPoints(payouts) {
     payoutPoints.push(payoutPoint);
   });
   writePoints(payoutPoints);
+}
+function renameBlockFiles(validFileList) {
+  validFileList.forEach(function (file) {
+    const fileWithoutExtension = file.replace(/\.[^/.]+$/, "");
+    const oldFilePath = `${blockFilesPath}/${file}`;
+    const newFilePath = `${blockFilesPath}/${fileWithoutExtension}.imported`;
+    fs.rename(oldFilePath, newFilePath, (error) => {
+      if (error) {
+        console.log('error naming files: ', error);
+      }
+    });
+  });
 }
 
 // Write Points
