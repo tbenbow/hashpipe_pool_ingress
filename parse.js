@@ -11,7 +11,7 @@ var postTime;
 const {url, token, org, bucket, payoutsBucket, poolFilePath, userFilesPath, blockFilesPath} = require('./env');
 
 // Every minute "* * * * *" or every 10 seconds "*/10 * * * * *"
-cron.schedule("*\10 * * * * *", function() {
+cron.schedule("* * * * *", function() {
   const postTime = new Date();
   console.log("Writing Data: ", postTime);
   writePoolData(poolFilePath);
