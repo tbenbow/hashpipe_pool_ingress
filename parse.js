@@ -92,29 +92,29 @@ function parseUserFiles(fileList) {
 
 function createUserPoints(users) {
   var userPoints = [];
-
   users.forEach(function (user){
-    const userPoint = new Point('user-hashrate')
-      .floatField('value', user.userhashrate)
-      .tag('user', user.username)
-      .timestamp(postTime)
-    userPoints.push(userPoint);
-
+    if (parseInt(user.userhashrate) > 0) {
+      const userPoint = new Point('user-hashrate')
+        .floatField('value', user.userhashrate)
+        .tag('user', user.username)
+        .timestamp(postTime)
+      userPoints.push(userPoint);
+    }
   });
   writePoints(userPoints);
 }
 
 function createWorkerPoints(workers) {
   var workerPoints = [];
-
   workers.forEach(function (worker){
-    const userPoint = new Point('worker-hashrate')
-      .floatField('value', worker.workerhashrate)
-      .tag('user', worker.username)
-      .tag('worker', worker.workername)
-      .timestamp(postTime)
-    workerPoints.push(userPoint);
-
+    if (parseInt(worker.workerhashrate) > 0) {
+      const userPoint = new Point('worker-hashrate')
+        .floatField('value', worker.workerhashrate)
+        .tag('user', worker.username)
+        .tag('worker', worker.workername)
+        .timestamp(postTime)
+      workerPoints.push(userPoint);
+    }
     writePoints(workerPoints);
   });
 }
