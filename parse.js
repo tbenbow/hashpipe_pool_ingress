@@ -67,14 +67,14 @@ function parseUserFiles(fileList) {
   fileList.forEach(function (file) {
     let userData = fs.readFileSync(`${userFilesPath}/${file}`, 'utf8');
     let user = JSON.parse(userData);
-    if (parseInt(user.hashrate1m) > 0) {
+    if (parseFloat(user.hashrate1m) > 0) {
       users.push({
         time: user.time,
         username: file,
         userhashrate: toPetahash(user.hashrate1m).toFixed(4),
       });
       user.worker.forEach(function (worker) {
-        if (parseInt(worker.hashrate1m) > 0) {
+        if (parseFloat(worker.hashrate1m) > 0) {
           workerIdArray = worker.workername.split('.');
           workers.push({
             time: user.time,
@@ -93,7 +93,7 @@ function parseUserFiles(fileList) {
 function createUserPoints(users) {
   var userPoints = [];
   users.forEach(function (user){
-    if (parseInt(user.userhashrate) > 0) {
+    if (parseFloat(user.userhashrate) > 0) {
       const userPoint = new Point('user-hashrate')
         .floatField('value', user.userhashrate)
         .tag('user', user.username)
@@ -107,7 +107,7 @@ function createUserPoints(users) {
 function createWorkerPoints(workers) {
   var workerPoints = [];
   workers.forEach(function (worker){
-    if (parseInt(worker.workerhashrate) > 0) {
+    if (parseFloat(worker.workerhashrate) > 0) {
       const userPoint = new Point('worker-hashrate')
         .floatField('value', worker.workerhashrate)
         .tag('user', worker.username)
